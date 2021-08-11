@@ -6,6 +6,8 @@ import { useEffect } from "react";
 import { uiActions } from "./store/ui-slice";
 import Notification from "./components/UI/Notification";
 
+let isInitial = true; //prevent sending data the first time
+
 function App() {
   const isVisible = useSelector((state) => state.ui.cartIsVisible);
   const cart = useSelector((state) => state.cart);
@@ -34,8 +36,6 @@ function App() {
         throw new Error("Sending cart data failed!");
       }
 
-      const responseData = await response.json();
-
       dispatch(
         uiActions.showNotification({
           status: "success",
@@ -44,6 +44,12 @@ function App() {
         })
       );
     };
+
+    if (isInitial) {
+      isInitial = false; //allow to send data the next time
+      return;
+    }
+
     sendCartData().catch((error) => {
       dispatch(
         uiActions.showNotification({
