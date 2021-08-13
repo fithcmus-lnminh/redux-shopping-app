@@ -1,6 +1,39 @@
 import { uiActions } from "./ui-slice";
+import { cartActions } from "./cart-slice";
 
 //action creator thunk
+export const fetchCartData = () => {
+  //return func with dispatch => redux-thunk
+  return async (dispatch) => {
+    const fetchData = async () => {
+      const response = await fetch(
+        "https://react-http-b2a24-default-rtdb.firebaseio.com/cart.json"
+      );
+
+      if (!response.ok) {
+        throw new Error("Could not fetch cart data!");
+      }
+
+      const data = response.json();
+
+      return data;
+    };
+
+    try {
+      const cartData = await fetchData();
+      dispatch(cartActions.replaceCart(cartData));
+    } catch (error) {
+      dispatch(
+        uiActions.showNotification({
+          status: "error",
+          title: "Error!",
+          message: "Sending data failed!",
+        })
+      );
+    }
+  };
+};
+
 export const sendCartData = (cart) => {
   //return func with dispatch => redux-thunk
   return async (dispatch) => {
